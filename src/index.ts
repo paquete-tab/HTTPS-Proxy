@@ -53,12 +53,22 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     }
     
     // 新しいリクエストを作成
-    const apiRequest = new Request(apiUrl, {
-      method: request.method,
-      headers: requestHeaders,
-      body: requestBody,
-      redirect: 'follow'
-    });
+    const apiRequest = (() => {
+      if (request.method === 'GET' || request.method === 'HEAD') {
+        return new Request(apiUrl, {
+          method: request.method,
+          headers: requestHeaders,
+          redirect: 'follow'
+        })
+      } else {
+        return new Request(apiUrl, {
+          method: request.method,
+          headers: requestHeaders,
+          body: requestBody,
+          redirect: 'follow'
+        })
+      }
+    })();
     
     // HTTP APIへリクエストを送信
     const response = await fetch(apiRequest);
